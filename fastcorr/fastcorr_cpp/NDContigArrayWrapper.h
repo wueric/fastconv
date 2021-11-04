@@ -17,7 +17,7 @@ template<class T> struct TwoDContigArrayWrapper {
     const int64_t dim0;
     const int64_t dim1;
 
-    TwoDContigArrayWrapper<T> (T *ptr, const int64_t dim0_, const int64_t dim1_) : array_ptr(ptr), , dim0(dim0_), dim1(dim1_) { };
+    TwoDContigArrayWrapper<T> (T *ptr, const int64_t dim0_, const int64_t dim1_) : array_ptr(ptr), dim0(dim0_), dim1(dim1_) { };
 };
 
 #endif //FASTCONV_NDCONTIGARRAYWRAPPER_H

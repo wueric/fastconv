@@ -258,7 +258,7 @@ void correlate_accum_over_channels(
 #endif
 
     float rem_acc, temp2;
-    for (; j < n_samples_data - n_taps + 1 - 4; ++j) {
+    for (; j < n_samples_data - n_taps + 1; ++j) {
 
         rem_acc = 0.0;
 
@@ -360,16 +360,18 @@ void correlate_accum_over_channels(
     }
 #endif
 
-    double rem_acc;
-    for (; j < n_samples_data - n_taps + 1 - 4; ++j) {
+    double rem_acc, temp2;
+    for (; j < n_samples_data - n_taps + 1; ++j) {
 
         rem_acc = 0.0;
 
         for (int64_t ch = 0; ch < n_chan_filter; ++ch) {
 
-            rem_acc += _dot_product(raw_data_ptr + ch * n_samples_data + j,
+            temp2 = _dot_product(raw_data_ptr + ch * n_samples_data + j,
                                     filter_taps_array + ch * n_taps,
                                     n_taps);
+
+	    rem_acc += temp2;
 
         }
         *(output_ptr + j) = rem_acc;

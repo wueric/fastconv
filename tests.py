@@ -278,8 +278,8 @@ def test_multidata_multifilter_1D_A_float():
 
 
 def test_single_data_single_filter_accum_A_double():
-    test_data = DATA[0, :, :].astype(np.float64)
-    test_filter = FILTERS[0, :, :].astype(np.float64)
+    test_data = (DATA[0, :, :] / 100.0).astype(np.float64)
+    test_filter = (FILTERS[0, :, :] / 100.0).astype(np.float64)
 
     buffer = np.zeros((test_data.shape[0], test_data.shape[1] - test_filter.shape[1] + 1),
                           dtype=np.float64)
@@ -297,8 +297,8 @@ def test_single_data_single_filter_accum_A_double():
 
 
 def test_single_data_single_filter_accum_A_float():
-    test_data = DATA[0, :, :].astype(np.float32)
-    test_filter = FILTERS[0, :, :].astype(np.float32)
+    test_data = (DATA[0, :, :] / 100.0).astype(np.float32)
+    test_filter = (FILTERS[0, :, :] / 100.0).astype(np.float32) 
 
     buffer = np.zeros((test_data.shape[0], test_data.shape[1] - test_filter.shape[1] + 1),
                           dtype=np.float32)
