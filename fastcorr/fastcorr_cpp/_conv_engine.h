@@ -240,7 +240,7 @@ void correlate_accum_over_channels(
     int64_t j = 0;
 #ifdef __AVX2__
     __m256 acc, temp;
-    for (; j < n_samples_data - n_taps + 1 - 4; j += 4) {
+    for (; j < n_samples_data - n_taps + 1 - 8; j += 8) {
 
         acc = _mm256_setzero_ps();
 
