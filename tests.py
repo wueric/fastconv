@@ -178,7 +178,7 @@ def test_single_data_multifilter_1D_A_double():
 
     comparison = np.zeros((test_filter.shape[0], test_data.shape[0] - test_filter.shape[1] + 1),
                           dtype=np.float64)
-    for i in range(test_data.shape[0]):
+    for i in range(test_filter.shape[0]):
         comparison[i, ...] = np.correlate(test_data, test_filter[i, :])
 
     my_output = corr1d.multiple_filter_single_data_correlate1D(test_data, test_filter)
@@ -195,7 +195,7 @@ def test_single_data_multifilter_1D_A_float():
 
     comparison = np.zeros((test_filter.shape[0], test_data.shape[0] - test_filter.shape[1] + 1),
                           dtype=np.float32)
-    for i in range(test_data.shape[0]):
+    for i in range(test_filter.shape[0]):
         comparison[i, ...] = np.correlate(test_data, test_filter[i, :])
 
     my_output = corr1d.multiple_filter_single_data_correlate1D(test_data, test_filter)
