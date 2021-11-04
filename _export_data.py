@@ -25,13 +25,13 @@ if __name__ == '__main__':
     os.makedirs(TESTCASE_PATH, exist_ok=True)
     data_file_path = os.path.join(TESTCASE_PATH, MULTIDATA_MULTICHAN_FNAME)
 
-    with bin2py.PyBinFileReader(TEST_DATASET, TEST_DATASET_NAME, is_row_major=True) as pbfr:
+    with bin2py.PyBinFileReader(TEST_DATASET, is_row_major=True) as pbfr:
 
         n_channels = pbfr.num_electrodes
 
         output_npy_buffer = np.zeros((len(DATA_START_SAMPLES), n_channels, N_SAMPLES_DATA), dtype=np.float64)
         for i, offset in enumerate(DATA_START_SAMPLES):
-            output_npy_buffer[i,...] = pbfr.get_data(offset, N_SAMPLES_DATA)
+            output_npy_buffer[i,...] = pbfr.get_data(offset, N_SAMPLES_DATA)[1:,:]
 
     np.save(data_file_path, output_npy_buffer, allow_pickle=True)
 
@@ -43,4 +43,4 @@ if __name__ == '__main__':
     for i, cell_id in enumerate(TEMPLATE_CELL_IDS):
         ei_buffer[i, ...] = analysis_dset.get_ei_for_cell(cell_id).ei
 
-    np.save(analysis_dset, ei_buffer, allow_pickle=True)
+    np.save(filter_file_path, ei_buffer, allow_pickle=True)

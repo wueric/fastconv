@@ -2,7 +2,11 @@
 // Created by Eric Wu on 11/4/21.
 //
 
+#ifndef FASTCONV__FAST1DCORR_H
+#define FASTCONV__FAST1DCORR_H
+
 #include "NDContigArrayWrapper.h"
+#include "_conv_engine.h"
 
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
@@ -24,10 +28,9 @@ inline void omp_set_num_threads(int num_threads) { return; }
 
 #endif
 
-#ifndef FASTCONV__FAST1DCORR_H
-#define FASTCONV__FAST1DCORR_H
+namespace py=pybind11;
 
-template<T>
+template<class T>
 py::array_t<T, py::array::c_style | py::array::forcecast> batched_filters_batched_data_correlate(
         py::array_t<T, py::array::c_style | py::array::forcecast> batched_data,
         py::array_t<T, py::array::c_style | py::array::forcecast> batched_filters) {
@@ -36,7 +39,7 @@ py::array_t<T, py::array::c_style | py::array::forcecast> batched_filters_batche
      * Correlate many channels of data with a single shared filter
      */
 
-    py::buffer_info raw_data_info = raw_data.request();
+    py::buffer_info raw_data_info = batched_data.request();
     T *raw_data_ptr = static_cast<T *> (raw_data_info.ptr);
     if (raw_data_info.ndim != 2) {
         throw std::invalid_argument("Data must have dim 2");
@@ -45,7 +48,7 @@ py::array_t<T, py::array::c_style | py::array::forcecast> batched_filters_batche
     const int64_t n_samples_raw_data = raw_data_info.shape[1];
     const int64_t n_channels_raw_data = raw_data_info.shape[0];
 
-    py::buffer_info filter_taps_info = batched_filter_taps.request();
+    py::buffer_info filter_taps_info = batched_filters.request();
     T *filter_taps_array = static_cast<T *> (filter_taps_info.ptr);
     if (filter_taps_info.ndim != 2) {
         throw std::invalid_argument("Batched filter must have dim 2");
@@ -98,7 +101,7 @@ py::array_t<T, py::array::c_style | py::array::forcecast> batched_filters_batche
 }
 
 
-template<T>
+template<class T>
 py::array_t<T, py::array::c_style | py::array::forcecast> batched_data_batched_filter_multichan_correlate_accum(
         py::array_t<T, py::array::c_style | py::array::forcecast> batched_multichan_data,
         py::array_t<T, py::array::c_style | py::array::forcecast> batched_multichan_filters) {
@@ -136,31 +139,31 @@ py::array_t<T, py::array::c_style | py::array::forcecast> batched_data_batched_f
     T *output_data_ptr = static_cast<T *> (output_info.ptr);
 
 #pragma omp parallel for collapse(2)
-    for (int64_t b_data = 0; b_data < n_batch_data; ++n_batch_data) {
-        for (int64_t b_filter = 0; b_filter < n_batch_filters; ++n_batch_filters) {
+    for (int64_t b_data = 0; b_data < n_batch_data; ++b_data) {
+        for (int64_t b_filter = 0; b_filter < n_batch_filters; ++b_filter) {
 
-            int64_t data_offset_ptr = multichan_data_ptr + b_data * (n_channels_raw_data * n_samples_raw_data);
+            T *data_offset_ptr = multichan_data_ptr + b_data * (n_channels_raw_data * n_samples_raw_data);
             TwoDContigArrayWrapper<T> data_wrapper = TwoDContigArrayWrapper<T>(
                     data_offset_ptr,
                     n_channels_raw_data,
                     n_samples_raw_data);
 
-            int64_t kernel_offset_ptr = filter_taps_array + b_filter * (n_channels_filters * n_taps_filters);
+            T *kernel_offset_ptr = filter_taps_array + b_filter * (n_channels_filters * n_taps_filters);
             TwoDContigArrayWrapper<T> filter_wrapper = TwoDContigArrayWrapper<T>(
                     kernel_offset_ptr,
                     n_channels_filters,
                     n_taps_filters);
 
-            int64_t write_offset_ptr = output_data_ptr + (b_data * n_batch_filters + b_filter) * n_samples_output;
+            T *write_offset_ptr = output_data_ptr + (b_data * n_batch_filters + b_filter) * n_samples_output;
             OneDContigArrayWrapper<T> output_wrapper = OneDContigArrayWrapper<T>(
                     write_offset_ptr,
                     n_samples_output);
 
-            correlate_accum(data_wrapper, filter_wrapper, output_wrapper);
+            correlate_accum_over_channels(data_wrapper, filter_wrapper, output_wrapper);
         }
     }
 
-    return convolved_output
+    return convolved_output;
 }
 
 

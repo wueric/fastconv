@@ -82,7 +82,7 @@ class BuildExt(build_ext):
 
 ext_modules = [
     Extension(
-        'fastconv.fastcorr.fastcorr_cpp',
+        'fastcorr.fastcorr_cpp',
         ['fastcorr/fastcorr_cpp/fastcorr_pbind.cpp'],
         include_dirs=[
             # Path to pybind11 headers
