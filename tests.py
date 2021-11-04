@@ -278,8 +278,8 @@ def test_multidata_multifilter_1D_A_float():
 
 
 def test_single_data_single_filter_accum_A_double():
-    test_data = (DATA[0, :, :] / 100.0).astype(np.float64)
-    test_filter = (FILTERS[0, :, :] / 100.0).astype(np.float64)
+    test_data = (DATA[0, :, :] / 10.0).astype(np.float64)
+    test_filter = (FILTERS[0, :, :] / 10.0).astype(np.float64)
 
     buffer = np.zeros((test_data.shape[0], test_data.shape[1] - test_filter.shape[1] + 1),
                           dtype=np.float64)
@@ -297,8 +297,8 @@ def test_single_data_single_filter_accum_A_double():
 
 
 def test_single_data_single_filter_accum_A_float():
-    test_data = (DATA[0, :, :] / 100.0).astype(np.float32)
-    test_filter = (FILTERS[0, :, :] / 100.0).astype(np.float32) 
+    test_data = (DATA[0, :, :] / 10.0).astype(np.float32)
+    test_filter = (FILTERS[0, :, :] / 10.0).astype(np.float32)
 
     buffer = np.zeros((test_data.shape[0], test_data.shape[1] - test_filter.shape[1] + 1),
                           dtype=np.float32)
@@ -308,6 +308,86 @@ def test_single_data_single_filter_accum_A_float():
     comparison = np.sum(buffer, axis=0)
 
     my_output = corr1d.multichan_accum_correlate1D(test_data, test_filter)
+
+    assert my_output.dtype == np.float32
+    assert my_output.shape == comparison.shape
+
+    assert np.allclose(comparison, my_output, rtol=1e-3, atol=1e-2)
+
+
+def test_single_data_multifilter_accum_A_double():
+    test_data = (DATA[0, :13, :] / 10.0).astype(np.float64)
+    test_filter = (FILTERS[:, :13, :] / 10.0).astype(np.float64)
+
+    buffer = np.zeros((test_filter.shape[0], test_data.shape[0], test_data.shape[1] - test_filter.shape[2] + 1),
+                          dtype=np.float64)
+
+    for k in range(test_filter.shape[0]):
+        for j in range(test_data.shape[0]):
+            buffer[k, j, :] = np.correlate(test_data[j,:], test_filter[k, j, :])
+    comparison = np.sum(buffer, axis=1)
+
+    my_output = corr1d.batch_filter_multichan_accum_correlate1D(test_data, test_filter)
+
+    assert my_output.dtype == np.float64
+    assert my_output.shape == comparison.shape
+
+    assert np.allclose(comparison, my_output, rtol=1e-3, atol=1e-2)
+
+
+def test_single_data_multifilter_accum_A_float():
+    test_data = (DATA[0, :13, :] / 10.0).astype(np.float32)
+    test_filter = (FILTERS[:, :13, :] / 10.0).astype(np.float32)
+
+    buffer = np.zeros((test_filter.shape[0], test_data.shape[0], test_data.shape[1] - test_filter.shape[2] + 1),
+                          dtype=np.float32)
+
+    for k in range(test_filter.shape[0]):
+        for j in range(test_data.shape[0]):
+            buffer[k, j, :] = np.correlate(test_data[j,:], test_filter[k, j, :])
+    comparison = np.sum(buffer, axis=1)
+
+    my_output = corr1d.batch_filter_multichan_accum_correlate1D(test_data, test_filter)
+
+    assert my_output.dtype == np.float32
+    assert my_output.shape == comparison.shape
+
+    assert np.allclose(comparison, my_output, rtol=1e-3, atol=1e-2)
+
+
+def test_multidata_single_filter_accum_A_double():
+    test_data = (DATA[:, :13, :] / 10.0).astype(np.float64)
+    test_filter = (FILTERS[0, :13, :] / 10.0).astype(np.float64)
+
+    buffer = np.zeros((test_data.shape[0], test_data.shape[1], test_data.shape[2] - test_filter.shape[1] + 1),
+                          dtype=np.float64)
+
+    for k in range(test_data.shape[0]):
+        for j in range(test_data.shape[1]):
+            buffer[k, j, :] = np.correlate(test_data[k, j,:], test_filter[j, :])
+    comparison = np.sum(buffer, axis=1)
+
+    my_output = corr1d.batch_data_multichan_accum_correlate1D(test_data, test_filter)
+
+    assert my_output.dtype == np.float64
+    assert my_output.shape == comparison.shape
+
+    assert np.allclose(comparison, my_output, rtol=1e-3, atol=1e-2)
+
+
+def test_multidata_single_filter_accum_A_float():
+    test_data = (DATA[:, :13, :] / 10.0).astype(np.float32)
+    test_filter = (FILTERS[0, :13, :] / 10.0).astype(np.float32)
+
+    buffer = np.zeros((test_data.shape[0], test_data.shape[1], test_data.shape[2] - test_filter.shape[1] + 1),
+                          dtype=np.float32)
+
+    for k in range(test_data.shape[0]):
+        for j in range(test_data.shape[1]):
+            buffer[k, j, :] = np.correlate(test_data[k, j,:], test_filter[j, :])
+    comparison = np.sum(buffer, axis=1)
+
+    my_output = corr1d.batch_data_multichan_accum_correlate1D(test_data, test_filter)
 
     assert my_output.dtype == np.float32
     assert my_output.shape == comparison.shape
