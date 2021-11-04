@@ -411,7 +411,7 @@ def test_multidata_multifilter_accum_A_double():
     for k in range(test_data.shape[0]):
         for l in range(test_filter.shape[0]):
             for j in range(test_data.shape[1]):
-                buffer[l, k, j, :] = np.correlate(test_data[k, j, :], test_filter[l, j, :])
+                buffer[k, l, j, :] = np.correlate(test_data[k, j, :], test_filter[l, j, :])
     comparison = np.sum(buffer, axis=2)
 
     my_output = corr1d.batch_data_batch_filter_multichan_accum_correlate1D(test_data, test_filter)
@@ -434,7 +434,7 @@ def test_multidata_multifilter_accum_A_float():
     for k in range(test_data.shape[0]):
         for l in range(test_filter.shape[0]):
             for j in range(test_data.shape[1]):
-                buffer[l, k, j, :] = np.correlate(test_data[k, j, :], test_filter[l, j, :])
+                buffer[k, l, j, :] = np.correlate(test_data[k, j, :], test_filter[l, j, :])
     comparison = np.sum(buffer, axis=2)
 
     my_output = corr1d.batch_data_batch_filter_multichan_accum_correlate1D(test_data, test_filter)
