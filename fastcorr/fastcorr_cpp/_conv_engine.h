@@ -1,6 +1,8 @@
 #ifndef CONV_ENGINE_H
 #define CONV_ENGINE_H
 
+#define SWITCH_TO_SSE_SIZE 256
+
 #include <stdlib.h>
 #include <stdint.h>
 #include <immintrin.h>
@@ -10,7 +12,7 @@
 
 __m256 _oct_unrolled_kernel_correlate(
         float *long_array,
-        const OneDContigArrayWrapper<float>& kernel_wrapper) {
+        const OneDContigArrayWrapper<float> &kernel_wrapper) {
 
     /*
      * Computes eight entries of the cross-correlation simultaneously
@@ -98,7 +100,7 @@ float _single_prec_dot_product(float *a, float *b, const size_t length) {
 
 __m256d _quad_unrolled_kernel_correlate(
         double *long_array,
-        const OneDContigArrayWrapper<double>& kernel_wrapper) {
+        const OneDContigArrayWrapper<double> &kernel_wrapper) {
 
     size_t i = 0;
 
@@ -296,6 +298,7 @@ void correlate1D(
 
     int64_t j = 0;
 #ifdef __AVX2__
+
     __m256d acc;
 
     // fast correlate over the full length of the kernel, up to a certain point
@@ -307,6 +310,7 @@ void correlate1D(
         _mm256_storeu_pd(write_offset + j, acc);
 
     }
+
 #endif
 
     // now clean up the remainder of the data
