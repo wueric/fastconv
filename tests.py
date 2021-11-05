@@ -1,4 +1,4 @@
-from fastcorr import corr1d
+import corr1d
 import numpy as np
 
 import os

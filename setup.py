@@ -48,7 +48,7 @@ def cpp_flag(compiler):
 
 def make_pybind11_extension_with_flags (module_name, dependencies):
 
-    c_opts = ['-O2', '-ffast-math', '-march=native', '-fopenmp']
+    c_opts = ['-O3', '-ffast-math', '-march=native', '-fopenmp']
     l_opts = ['-fopenmp']
 
     if sys.platform == 'darwin':

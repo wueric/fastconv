@@ -74,7 +74,6 @@ __m256 _oct_unrolled_kernel_correlate(
         for (int64_t j = 0; j < 4; ++j) {
             from_kernel = _mm256_broadcast_ss(small_kernel + i + j);
             from_long_array = _mm256_loadu_ps(long_array + i + j);
-
             prod = _mm256_mul_ps(from_kernel, from_long_array);
             quad_accumulator = _mm256_add_ps(prod, quad_accumulator);
         }
@@ -156,10 +155,10 @@ __m256d _quad_unrolled_kernel_correlate(
         for (int64_t j = 0; j < 4; ++j) {
             from_kernel = _mm256_broadcast_sd(small_kernel + i + j);
             from_long_array = _mm256_loadu_pd(long_array + i + j);
-
             prod = _mm256_mul_pd(from_kernel, from_long_array);
             quad_accumulator = _mm256_add_pd(prod, quad_accumulator);
         }
+        
     }
 
     for (; i < kernel_length; ++i) {
@@ -200,7 +199,7 @@ void correlate1D(
     float *raw_data_ptr = raw_data_wrapper.array_ptr;
 
     int64_t j = 0;
-#ifdef __AVX2__
+#ifdef __AVX__
     __m256 acc;
     for (; j < n_samples_raw_data - n_samples_taps + 1 - 8; j += 8) {
 
@@ -240,7 +239,7 @@ void correlate_accum_over_channels(
     float *output_ptr = output_wrapper.array_ptr;
 
     int64_t j = 0;
-#ifdef __AVX2__
+#ifdef __AVX__
     __m256 acc, temp;
     for (; j < n_samples_data - n_taps + 1 - 8; j += 8) {
 
@@ -297,7 +296,7 @@ void correlate1D(
     double *raw_data_ptr = raw_data_wrapper.array_ptr;
 
     int64_t j = 0;
-#ifdef __AVX2__
+#ifdef __AVX__
 
     __m256d acc;
 
@@ -345,7 +344,7 @@ void correlate_accum_over_channels(
     double *output_ptr = output_wrapper.array_ptr;
 
     int64_t j = 0;
-#ifdef __AVX2__
+#ifdef __AVX__
     __m256d acc, temp;
     for (; j < n_samples_data - n_taps + 1 - 4; j += 4) {
 
