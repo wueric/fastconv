@@ -30,8 +30,8 @@ int64_t conv2D_samesize(
     int64_t data_size_X = input_wrapper.dim1;
     int64_t data_size_Y = input_wrapper.dim0;
 
-    int64_t kernel_size_X = input_wrapper.dim1;
-    int64_t kernel_size_Y = input_wrapper.dim0;
+    int64_t kernel_size_X = kernel_wrapper.dim1;
+    int64_t kernel_size_Y = kernel_wrapper.dim0;
 
     // the x coordinate of the kernel's center
     int64_t kern_cent_X = (kernel_size_X - 1) / 2;
@@ -117,8 +117,8 @@ int64_t conv2D_samesize(
     int64_t data_size_X = input_wrapper.dim1;
     int64_t data_size_Y = input_wrapper.dim0;
 
-    int64_t kernel_size_X = input_wrapper.dim1;
-    int64_t kernel_size_Y = input_wrapper.dim0;
+    int64_t kernel_size_X = kernel_wrapper.dim1;
+    int64_t kernel_size_Y = kernel_wrapper.dim0;
 
     // the x coordinate of the kernel's center
     int64_t kern_cent_X = (kernel_size_X - 1) / 2;
@@ -201,8 +201,8 @@ int64_t conv2D_shrinksize(
     int64_t data_size_X = input_wrapper.dim1;
     int64_t data_size_Y = input_wrapper.dim0;
 
-    int64_t kernel_size_X = input_wrapper.dim1;
-    int64_t kernel_size_Y = input_wrapper.dim0;
+    int64_t kernel_size_X = kernel_wrapper.dim1;
+    int64_t kernel_size_Y = kernel_wrapper.dim0;
 
     // the x coordinate of the kernel's center
     int64_t kern_cent_X = (kernel_size_X - 1) / 2;
@@ -271,8 +271,8 @@ int64_t conv2D_shrinksize(
     int64_t data_size_X = input_wrapper.dim1;
     int64_t data_size_Y = input_wrapper.dim0;
 
-    int64_t kernel_size_X = input_wrapper.dim1;
-    int64_t kernel_size_Y = input_wrapper.dim0;
+    int64_t kernel_size_X = kernel_wrapper.dim1;
+    int64_t kernel_size_Y = kernel_wrapper.dim0;
 
     // the x coordinate of the kernel's center
     int64_t kern_cent_X = (kernel_size_X - 1) / 2;
