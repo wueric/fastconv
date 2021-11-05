@@ -150,8 +150,6 @@ __m256d _quad_unrolled_kernel_correlate(
 #else
 
     __m256d quad_accumulator = _mm256_setzero_pd();
-
-    __m256d from_long_array, from_kernel;
     __m256d prod;
 
     for (; i < kernel_length - 4; i += 4) {

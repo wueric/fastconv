@@ -122,8 +122,8 @@ py::array_t<T, py::array::c_style | py::array::forcecast> batch_smallfilter_2dco
     #pragma omp parallel for
     for (int64_t i = 0; i < n_images; ++i) {
 
-        float *read_offset = i * read_offset_per_image + image_matrix_ptr;
-        float *write_offset = i * offset_per_image + output_data_ptr;
+        T *read_offset = i * read_offset_per_image + image_matrix_ptr;
+        T *write_offset = i * offset_per_image + output_data_ptr;
 
         TwoDContigArrayWrapper<T> input_wrapper = TwoDContigArrayWrapper<T>(
                 read_offset, input_height, input_width);
