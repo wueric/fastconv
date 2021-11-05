@@ -46,6 +46,31 @@ def cpp_flag(compiler):
                        'is needed!')
 
 
+def make_pybind11_extension_with_flags (module_name, dependencies):
+
+    c_opts = ['-O2', '-ffast-math', '-march=native', '-fopenmp']
+    l_opts = ['-fopenmp']
+
+    if sys.platform == 'darwin':
+        darwin_opts = ['-stdlib=libc++', '-mmacosx-version-min=10.7', '-std=c++11']
+
+        c_opts = c_opts + darwin_opts
+        l_opts = l_opts + darwin_opts
+
+    return Extension(
+        module_name,
+        dependencies,
+        include_dirs=[
+            # Path to pybind11 headers
+            get_pybind_include(),
+            get_pybind_include(user=True)
+        ],
+        language='c++',
+        extra_compile_args = c_opts,
+        extra_link_args= l_opts
+    )
+
+
 class BuildExt(build_ext):
     """A custom build extension for adding compiler-specific options."""
     c_opts = {
@@ -91,16 +116,35 @@ ext_modules = [
         ],
         language='c++'
     ),
+    Extension(
+        'conv2d.imageconv_cpp',
+        ['conv2d/imageconv_cpp/imageconv_pbind.cpp'],
+        include_dirs=[
+            # Path to pybind11 headers
+            get_pybind_include(),
+            get_pybind_include(user=True)
+        ],
+        language='c++'
+    ),
+]
+
+py_modules = [
+        'conv2d',
+        'corr1d',
+]
+
+pybind11_ext_modules = [
+    make_pybind11_extension_with_flags('fastcorr.fastcorr_cpp', ['fastcorr/fastcorr_cpp/fastcorr_pbind.cpp']),
+    make_pybind11_extension_with_flags('conv2d.imageconv_cpp',
+                                       ['conv2d/imageconv_cpp/imageconv_pbind.cpp']),
 ]
 
 setup(
     name='fastconv',
     version=__version__,
     author='Eric Gene Wu',
-    ext_modules=ext_modules,
-    packages=['lib', 'lib.cpplib'],
     install_requires=['pybind11>=2.3'],
     setup_requires=['pybind11>=2.3'],
-    cmdclass={'build_ext': BuildExt},
-    zip_safe=False,
+    packages=py_modules,
+    ext_modules=pybind11_ext_modules
 )

@@ -34,10 +34,13 @@ def short_filter_correlate1D(data_array: np.ndarray,
 def single_filter_multiple_data_correlate1D(data_array: np.ndarray,
                                             filter_array: np.ndarray) -> np.ndarray:
     '''
+    Performs parallel 1D correlations (multiple data, single filter), where the
+        filter is known to be very short and shorter than the data
 
-    :param data_array:
-    :param filter_array:
-    :return:
+    :param data_array: np.ndarray, shape (batch_data, data_len); dtype either np.float32 or np.float64
+    :param filter_array: np.ndarray, shape (filter_len, ), where filter_len <= data_len; dtype either
+        np.float64 or np.float32
+    :return: shape (batch_data, data_len - filter_len + 1)
     '''
     if data_array.ndim != 2:
         raise ValueError("data_array must have ndim 2")
@@ -59,10 +62,13 @@ def single_filter_multiple_data_correlate1D(data_array: np.ndarray,
 def multiple_filter_single_data_correlate1D(data_array: np.ndarray,
                                             filter_array: np.ndarray) -> np.ndarray:
     '''
+    Performs parallel 1D correlations (single data, multiple filters), where the
+        filter is known to be very short and shorter than the data
 
-    :param data_array:
-    :param filter_array:
-    :return:
+    :param data_array: np.ndarray, shape (data_len, ); dtype either np.float32 or np.float64
+    :param filter_array: np.ndarray, shape (n_filters, filter_len), where filter_len <= data_len; dtype either
+        np.float64 or np.float32
+    :return: shape (n_filters, data_len - filter_len + 1)
     '''
 
     if data_array.ndim != 1:
@@ -84,6 +90,15 @@ def multiple_filter_single_data_correlate1D(data_array: np.ndarray,
 
 def multiple_filter_multiple_data_correlate1D(data_array: np.ndarray,
                                               filter_array: np.ndarray) -> np.ndarray:
+    '''
+    Performs parallel 1D correlations (multiple data, multiple filters), where the
+        filter is known to be very short and shorter than the data
+
+    :param data_array: np.ndarray, shape (batch_data, data_len); dtype either np.float32 or np.float64
+    :param filter_array: np.ndarray, shape (n_filters, filter_len), where filter_len <= data_len; dtype either
+        np.float64 or np.float32
+    :return: shape (batch_data, n_filters, data_len - filter_len + 1)
+    '''
     if data_array.ndim != 2:
         raise ValueError("data_array must have ndim 2")
     if filter_array.ndim != 2:
@@ -143,7 +158,7 @@ def batch_filter_multichan_accum_correlate1D(data_array: np.ndarray,
     :param data_array: np.ndarray of shape (n_channels, data_len); dtype either np.float64 or np.float32
     :param filter_array: np.ndarray of shape (batch_filter, n_channels, filter_len); dtype either np.float64 or np.float32
         filter_len <= data_len
-    :return: np.ndarray, shape (batch_filter, data_len - filter_len + 1, )
+    :return: np.ndarray, shape (batch_filter, data_len - filter_len + 1)
     '''
     if data_array.ndim != 2:
         raise ValueError("data_array must have ndim 2")
@@ -177,7 +192,7 @@ def batch_data_multichan_accum_correlate1D(data_array: np.ndarray,
     :param data_array: np.ndarray of shape (batch_n_data, n_channels, data_len); dtype either np.float64 or np.float32
     :param filter_array: np.ndarray of shape (n_channels, filter_len); dtype either np.float64 or np.float32
         filter_len <= data_len
-    :return: np.ndarray, shape (batch_n_data, data_len - filter_len + 1, )
+    :return: np.ndarray, shape (batch_n_data, data_len - filter_len + 1)
     '''
     if data_array.ndim != 3:
         raise ValueError("data_array must have ndim 3")
@@ -209,9 +224,9 @@ def batch_data_batch_filter_multichan_accum_correlate1D(data_array: np.ndarray,
         templates
 
     :param data_array: np.ndarray of shape (batch_n_data, n_channels, data_len); dtype either np.float64 or np.float32
-    :param filter_array: np.ndarray of shape (n_channels, filter_len); dtype either np.float64 or np.float32
+    :param filter_array: np.ndarray of shape (n_filters, n_channels, filter_len); dtype either np.float64 or np.float32
         filter_len <= data_len
-    :return: np.ndarray, shape (batch_n_data, data_len - filter_len + 1, )
+    :return: np.ndarray, shape (batch_n_data, n_filters, data_len - filter_len + 1)
     '''
     if data_array.ndim != 3:
         raise ValueError("data_array must have ndim 3")

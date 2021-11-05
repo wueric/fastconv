@@ -5,7 +5,9 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#ifdef __AVX__
 #include <immintrin.h>
+#endif
 #include <string.h>
 #include <math.h>
 #include "NDContigArrayWrapper.h"
