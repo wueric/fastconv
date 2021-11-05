@@ -29,7 +29,7 @@ than the `np.float64` versions.
 ### Example use cases
 
 #### 1D correlation code
-* **Fast parallel high-pass filtering of Hierlemann array raw recorded data.** Every channel of Hierlemann array data 
+* **Fast parallel high-pass filtering of raw recorded data.** Every channel of Hierlemann array data 
 needs to high-pass filtered with an FIR filter before spike-sorting. This requires convolving chunks of data, where each chunk 
 contains ~1000 channels of data, each with ~20,0000-100,000 samples, with a relatively short FIR filter of length ~150.
 We can use `corr1d.single_filter_multiple_data_correlate1D`
@@ -82,3 +82,82 @@ and then add the folder to your PYTHONPATH.
 ### Limited documentation
 
 (see Python files `corr1d/corr1d.py` and `conv2d/conv2d.py` for full documentation, should be self-explanatory)
+
+#### 1D correlation with single filter, single data
+```python
+import numpy as np
+import corr1d 
+
+data = np.ones((10000, ), dtype=np.float64)
+filter_taps = np.array([0, 1, 2, 3, 4, 3, 2, 1, 0], dtype=np.float64)
+
+filtered_1d = corr1d.short_filter_correlate1D(data, filter_taps)
+```
+
+`filtered_1d` will have shape `(10000 - 9 + 1, )`, and corresponds to the "valid" correlation of `data` with `filter_taps`.
+
+#### 1D correlation with multiple data, multiple filter
+```python
+data = np.ones((5, 10000), dtype=np.float64)
+filter_taps = np.random.randn(17, 55).astype(np.float64)
+
+multidata_multifilter_1d = corr1d.multiple_filter_multiple_data_correlate1D(data, filter_taps)
+```
+
+`multidata_multifilter_1d` has shape `(5, 17, 10000 - 55 + 1)`, corresponding to the "valid" correlation of every data channel
+with every filter.
+
+#### 1D correlate-accumulate
+
+Suppose we have multichannel data and filters
+```python
+data = np.ones((5, 10000), dtype=np.float64)
+filter_taps = np.random.randn(5, 57).astype(np.float64)
+```
+
+`corr1d.multichan_accum_correlate1D(data, filter_taps)` is equivalent to applying the following function
+```python
+def single_accumulate(multi_data, multi_filter):
+
+    n_chan, data_len = multi_data.shape
+    _, filter_len = multi_filter.shape
+
+    output_len = data_len - filter_len + 1
+
+    temp = np.zeros((output_len, ), dtype=multi_data.dtype)
+    for i in range(n_chan):
+        temp += np.correlate(multi_data[i,:], multi_filter[i,:])
+    return temp
+```
+
+using the function call `single_accumulate(data, filter_taps)`. The output has shape `(10000 - 57 + 1, )`, corresponding
+to the sum of 'valid' convolutions along the second dimension over the first dimension.
+
+#### Batched-data Batched-filter correlate-accumulate
+
+Suppose we have multichannel data and filters
+```python
+data = np.ones((43, 5, 10000), dtype=np.float64)
+filter_taps = np.random.randn(17, 5, 57).astype(np.float64)
+```
+
+`corr1d.batch_data_batch_filter_multichan_accum_correlate1D(data, filter_taps)` is equivalent to applying the following function
+
+```python
+def multi_data_multi_filter_accumulate(multi_data, multi_filter):
+    batch_data, n_chan, data_len = multi_data.shape
+    batch_filter, n_chan, filter_len = multi_filter.shape
+
+    output_len = data_len - filter_len + 1
+    output = np.zeros((batch_data, batch_filter, output_len), dtype=multi_data.dtype)
+
+    for i in range(batch_data):
+        for j in range(batch_filter):
+            for k in range(n_chan):
+                output[i,j,:] += np.correlate(multi_data[i,k,:], multi_filter[j,k,:])
+    return output
+```
+
+using the function call `multi_data_multi_filter_accumulate(data, filter_taps)`. The output has shape `(43, 17, 10000-57+1)`.
+
+
