@@ -136,11 +136,11 @@ py_modules = [
 pybind11_ext_modules = [
     make_pybind11_extension_with_flags('fastconv.corr1d.fastcorr_cpp', ['fastconv/corr1d/fastcorr_cpp/fastcorr_pbind.cpp']),
     make_pybind11_extension_with_flags('fastconv.conv2d.imageconv_cpp',
-                                       ['fastconv.conv2d/imageconv_cpp/imageconv_pbind.cpp']),
+                                       ['fastconv/conv2d/imageconv_cpp/imageconv_pbind.cpp']),
 ]
 
 setup(
-    name='pfastconv',
+    name='fastconv',
     version=__version__,
     author='Eric Gene Wu',
     install_requires=['pybind11>=2.3'],
