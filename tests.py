@@ -582,7 +582,7 @@ def test__batch_filter_batch_data_channel_correlate1D():
     test_filter = (FILTERS[:, :N_CH, :] / 10.0).astype(np.float64)
 
     buffer = np.zeros((test_data.shape[0], test_filter.shape[0], test_filter.shape[1],
-                       test_data.shape[1] - test_filter.shape[2] + 1),
+                       test_data.shape[2] - test_filter.shape[2] + 1),
                       dtype=np.float64)
 
     for j in range(test_data.shape[0]):
@@ -606,7 +606,7 @@ def test__batch_filter_batch_data_channel_correlate1D__float():
     test_filter = (FILTERS[:, :N_CH, :] / 10.0).astype(np.float32)
 
     buffer = np.zeros((test_data.shape[0], test_filter.shape[0], test_filter.shape[1],
-                       test_data.shape[1] - test_filter.shape[2] + 1),
+                       test_data.shape[2] - test_filter.shape[2] + 1),
                       dtype=np.float32)
 
     for j in range(test_data.shape[0]):

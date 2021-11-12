@@ -149,9 +149,9 @@ py::array_t<T, py::array::c_style | py::array::forcecast> batched_filters_batche
             4,          /* How many dimensions? */
             {n_batch_data, n_batch_filters, n_channels_filters,
              n_samples_output},  /* Number of elements for each dimension */
-            {n_samples_output * sizeof(T) * n_channels_filters * n_batch_data,
-             n_samples_output * sizeof(T) * n_channels_filters,
-             n_samples_output * sizeof(T),
+            {sizeof(T) * n_samples_output * n_channels_filters * n_batch_filters,
+             sizeof(T) * n_samples_output * n_channels_filters,
+             sizeof(T) * n_samples_output,
              sizeof(T)} /* Strides for each dimension */
     );
 
@@ -168,13 +168,13 @@ py::array_t<T, py::array::c_style | py::array::forcecast> batched_filters_batche
                 int64_t data_offset =
                         b_data * (n_channels_filters * n_samples_raw_data) + b_ch * n_samples_raw_data;
                 OneDContigArrayWrapper<T> data_wrapper = OneDContigArrayWrapper<T>(
-                        multichan_data_ptr + b_data,
+                        multichan_data_ptr + data_offset,
                         n_samples_raw_data);
 
                 int64_t filter_offset = b_filter * (n_channels_filters * n_taps_filters) + b_ch * n_taps_filters;
                 OneDContigArrayWrapper<T> kernel_wrapper = OneDContigArrayWrapper<T>(
                         filter_taps_array + filter_offset,
-                        n_samples_taps);
+                        n_taps_filters);
 
                 int64_t output_offset = b_data * (n_samples_output * n_channels_filters * n_batch_filters) +
                         b_filter * (n_samples_output * n_channels_filters) + b_ch * n_samples_output;
@@ -182,7 +182,7 @@ py::array_t<T, py::array::c_style | py::array::forcecast> batched_filters_batche
                         output_data_ptr + output_offset,
                         n_samples_output);
 
-                correlate1D(chan_data_wrapper, kernel_wrapper, output_wrapper);
+                correlate1D(data_wrapper, kernel_wrapper, output_wrapper);
             }
         }
     }
