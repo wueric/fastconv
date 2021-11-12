@@ -1,4 +1,4 @@
-import corr1d
+from fastconv import corr1d
 import numpy as np
 
 import os

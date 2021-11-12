@@ -3,7 +3,7 @@ from setuptools.command.build_ext import build_ext
 import sys
 import setuptools
 
-__version__ = '0.0.2'
+__version__ = '0.0.3'
 
 
 class get_pybind_include(object):
@@ -129,18 +129,18 @@ ext_modules = [
 ]
 
 py_modules = [
-        'conv2d',
-        'corr1d',
+        'fastconv.conv2d',
+        'fastconv.corr1d',
 ]
 
 pybind11_ext_modules = [
-    make_pybind11_extension_with_flags('corr1d.fastcorr_cpp', ['corr1d/fastcorr_cpp/fastcorr_pbind.cpp']),
-    make_pybind11_extension_with_flags('conv2d.imageconv_cpp',
-                                       ['conv2d/imageconv_cpp/imageconv_pbind.cpp']),
+    make_pybind11_extension_with_flags('fastconv.corr1d.fastcorr_cpp', ['fastconv/corr1d/fastcorr_cpp/fastcorr_pbind.cpp']),
+    make_pybind11_extension_with_flags('fastconv.conv2d.imageconv_cpp',
+                                       ['fastconv/conv2d/imageconv_cpp/imageconv_pbind.cpp']),
 ]
 
 setup(
-    name='pfastconv',
+    name='fastconv',
     version=__version__,
     author='Eric Gene Wu',
     install_requires=['pybind11>=2.3'],

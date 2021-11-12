@@ -86,7 +86,7 @@ and then add the folder to your PYTHONPATH.
 #### 1D correlation with single filter, single data
 ```python
 import numpy as np
-import corr1d 
+from fastconv import corr1d 
 
 data = np.ones((10000, ), dtype=np.float64)
 filter_taps = np.array([0, 1, 2, 3, 4, 3, 2, 1, 0], dtype=np.float64)
