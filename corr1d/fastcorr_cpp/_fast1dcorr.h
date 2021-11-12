@@ -28,6 +28,8 @@ inline void omp_set_num_threads(int num_threads) { return; }
 
 #endif
 
+#define DATA_SAMPLES_PARALLEL_THRESH 512
+
 namespace py=pybind11;
 
 template<class T>
@@ -77,7 +79,7 @@ py::array_t<T, py::array::c_style | py::array::forcecast> batched_filters_batche
     T *output_data_ptr = static_cast<T *> (output_info.ptr);
 
     omp_set_num_threads(16);
-#pragma omp parallel for collapse(2) if(n_channels_raw_data * batch_n_filters > 64)
+#pragma omp parallel for collapse(2) if(n_channels_raw_data * batch_n_filters > 64 && n_samples_raw_data > DATA_SAMPLES_PARALLEL_THRESH)
     for (int64_t data_ch = 0; data_ch < n_channels_raw_data; ++data_ch) {
         for (int64_t batch_ch = 0; batch_ch < batch_n_filters; ++batch_ch) {
 
@@ -160,7 +162,7 @@ py::array_t<T, py::array::c_style | py::array::forcecast> batched_filters_batche
     T *output_data_ptr = static_cast<T *> (output_info.ptr);
 
     omp_set_num_threads(16);
-#pragma omp parallel for collapse(3) if(n_batch_filters * n_batch_data * n_channels_filters > 64)
+#pragma omp parallel for collapse(3) if(n_batch_filters * n_batch_data * n_channels_filters > 64 && n_samples_raw_data > DATA_SAMPLES_PARALLEL_THRESH)
     for (int64_t b_data = 0; b_data < n_batch_data; ++b_data) {
         for (int64_t b_filter = 0; b_filter < n_batch_filters; ++b_filter) {
             for (int64_t b_ch = 0; b_ch < n_channels_filters; ++b_ch) {
@@ -229,7 +231,7 @@ py::array_t<T, py::array::c_style | py::array::forcecast> batched_data_batched_f
     T *output_data_ptr = static_cast<T *> (output_info.ptr);
 
     omp_set_num_threads(16);
-#pragma omp parallel for collapse(2) if(n_batch_filters * n_batch_data > 64)
+#pragma omp parallel for collapse(2) if(n_batch_filters * n_batch_data > 64 && n_samples_raw_data > DATA_SAMPLES_PARALLEL_THRESH)
     for (int64_t b_data = 0; b_data < n_batch_data; ++b_data) {
         for (int64_t b_filter = 0; b_filter < n_batch_filters; ++b_filter) {
 
