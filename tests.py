@@ -444,3 +444,181 @@ def test_multidata_multifilter_accum_A_float():
     assert my_output.shape == comparison.shape
 
     assert np.allclose(comparison, my_output, rtol=1e-2, atol=1e-2)
+
+
+def test__single_filter_single_data_channel_correlate1D():
+    N_CH = 13
+    test_data = (DATA[0, :N_CH, :] / 10.0).astype(np.float64)
+    test_filter = (FILTERS[0, :N_CH, :] / 10.0).astype(np.float64)
+
+    buffer = np.zeros((test_data.shape[0], test_data.shape[1] - test_filter.shape[1] + 1),
+                      dtype=np.float64)
+
+    for k in range(N_CH):
+        buffer[k, :] = np.correlate(test_data[k, :], test_filter[k, :])
+
+    my_output = corr1d.single_filter_single_data_channel_correlate1D(test_data,
+                                                                     test_filter)
+    print(np.max(np.abs(buffer - my_output)))
+
+    assert my_output.dtype == np.float64
+    assert my_output.shape == buffer.shape
+
+    assert np.allclose(buffer, my_output, rtol=1e-2, atol=1e-2)
+
+
+def test__single_filter_single_data_channel_correlate1D__float():
+    N_CH = 13
+    test_data = (DATA[0, :N_CH, :] / 10.0).astype(np.float32)
+    test_filter = (FILTERS[0, :N_CH, :] / 10.0).astype(np.float32)
+
+    buffer = np.zeros((test_data.shape[0], test_data.shape[1] - test_filter.shape[1] + 1),
+                      dtype=np.float32)
+
+    for k in range(N_CH):
+        buffer[k, :] = np.correlate(test_data[k, :], test_filter[k, :])
+
+    my_output = corr1d.single_filter_single_data_channel_correlate1D(test_data,
+                                                                     test_filter)
+    print(np.max(np.abs(buffer - my_output)))
+
+    assert my_output.dtype == np.float32
+    assert my_output.shape == buffer.shape
+
+    assert np.allclose(buffer, my_output, rtol=1e-2, atol=1e-2)
+
+
+def test__single_filter_batch_data_channel_correlate1D():
+    N_CH = 13
+    test_data = (DATA[:, :N_CH, :] / 10.0).astype(np.float64)
+    test_filter = (FILTERS[0, :N_CH, :] / 10.0).astype(np.float64)
+
+    buffer = np.zeros((test_data.shape[0], test_data.shape[1], test_data.shape[2] - test_filter.shape[1] + 1),
+                      dtype=np.float64)
+
+    for i in range(test_data.shape[0]):
+        for k in range(test_data.shape[1]):
+            buffer[i, k, :] = np.correlate(test_data[i, k, :], test_filter[k, :])
+
+    my_output = corr1d.single_filter_batch_data_channel_correlate1D(test_data,
+                                                                    test_filter)
+    print(np.max(np.abs(buffer - my_output)))
+
+    assert my_output.dtype == np.float64
+    assert my_output.shape == buffer.shape
+
+    assert np.allclose(buffer, my_output, rtol=1e-2, atol=1e-2)
+
+
+def test__single_filter_batch_data_channel_correlate1D__float():
+    N_CH = 13
+    test_data = (DATA[:, :N_CH, :] / 10.0).astype(np.float32)
+    test_filter = (FILTERS[0, :N_CH, :] / 10.0).astype(np.float32)
+
+    buffer = np.zeros((test_data.shape[0], test_data.shape[1], test_data.shape[2] - test_filter.shape[1] + 1),
+                      dtype=np.float32)
+
+    for i in range(test_data.shape[0]):
+        for k in range(test_data.shape[1]):
+            buffer[i, k, :] = np.correlate(test_data[i, k, :], test_filter[k, :])
+
+    my_output = corr1d.single_filter_batch_data_channel_correlate1D(test_data,
+                                                                    test_filter)
+    print(np.max(np.abs(buffer - my_output)))
+
+    assert my_output.dtype == np.float32
+    assert my_output.shape == buffer.shape
+
+    assert np.allclose(buffer, my_output, rtol=1e-2, atol=1e-2)
+
+
+def test__batch_filter_single_data_channel_correlate1D():
+    N_CH = 13
+    test_data = (DATA[0, :N_CH, :] / 10.0).astype(np.float64)
+    test_filter = (FILTERS[:, :N_CH, :] / 10.0).astype(np.float64)
+
+    buffer = np.zeros((test_filter.shape[0], test_filter.shape[1], test_data.shape[1] - test_filter.shape[2] + 1),
+                      dtype=np.float64)
+
+    for i in range(test_filter.shape[0]):
+        for k in range(N_CH):
+            buffer[i, k, :] = np.correlate(test_data[k, :], test_filter[i, k, :])
+
+    my_output = corr1d.batch_filter_single_data_channel_correlate1D(test_data,
+                                                                    test_filter)
+    print(np.max(np.abs(buffer - my_output)))
+
+    assert my_output.dtype == np.float64
+    assert my_output.shape == buffer.shape
+
+    assert np.allclose(buffer, my_output, rtol=1e-2, atol=1e-2)
+
+
+def test__batch_filter_single_data_channel_correlate1D__float():
+    N_CH = 13
+    test_data = (DATA[0, :N_CH, :] / 10.0).astype(np.float32)
+    test_filter = (FILTERS[:, :N_CH, :] / 10.0).astype(np.float32)
+
+    buffer = np.zeros((test_filter.shape[0], test_filter.shape[1], test_data.shape[1] - test_filter.shape[2] + 1),
+                      dtype=np.float32)
+
+    for i in range(test_filter.shape[0]):
+        for k in range(N_CH):
+            buffer[i, k, :] = np.correlate(test_data[k, :], test_filter[i, k, :])
+
+    my_output = corr1d.batch_filter_single_data_channel_correlate1D(test_data,
+                                                                    test_filter)
+    print(np.max(np.abs(buffer - my_output)))
+
+    assert my_output.dtype == np.float32
+    assert my_output.shape == buffer.shape
+
+    assert np.allclose(buffer, my_output, rtol=1e-2, atol=1e-2)
+
+
+def test__batch_filter_batch_data_channel_correlate1D():
+    N_CH = 13
+    test_data = (DATA[:, :N_CH, :] / 10.0).astype(np.float64)
+    test_filter = (FILTERS[:, :N_CH, :] / 10.0).astype(np.float64)
+
+    buffer = np.zeros((test_data.shape[0], test_filter.shape[0], test_filter.shape[1],
+                       test_data.shape[1] - test_filter.shape[2] + 1),
+                      dtype=np.float64)
+
+    for j in range(test_data.shape[0]):
+        for i in range(test_filter.shape[0]):
+            for k in range(N_CH):
+                buffer[j, i, k, :] = np.correlate(test_data[j, k, :], test_filter[i, k, :])
+
+    my_output = corr1d.batch_filter_batch_data_channel_correlate1D(test_data,
+                                                                   test_filter)
+    print(np.max(np.abs(buffer - my_output)))
+
+    assert my_output.dtype == np.float64
+    assert my_output.shape == buffer.shape
+
+    assert np.allclose(buffer, my_output, rtol=1e-2, atol=1e-2)
+
+
+def test__batch_filter_batch_data_channel_correlate1D__float():
+    N_CH = 13
+    test_data = (DATA[:, :N_CH, :] / 10.0).astype(np.float32)
+    test_filter = (FILTERS[:, :N_CH, :] / 10.0).astype(np.float32)
+
+    buffer = np.zeros((test_data.shape[0], test_filter.shape[0], test_filter.shape[1],
+                       test_data.shape[1] - test_filter.shape[2] + 1),
+                      dtype=np.float32)
+
+    for j in range(test_data.shape[0]):
+        for i in range(test_filter.shape[0]):
+            for k in range(N_CH):
+                buffer[j, i, k, :] = np.correlate(test_data[j, k, :], test_filter[i, k, :])
+
+    my_output = corr1d.batch_filter_batch_data_channel_correlate1D(test_data,
+                                                                   test_filter)
+    print(np.max(np.abs(buffer - my_output)))
+
+    assert my_output.dtype == np.float32
+    assert my_output.shape == buffer.shape
+
+    assert np.allclose(buffer, my_output, rtol=1e-2, atol=1e-2)

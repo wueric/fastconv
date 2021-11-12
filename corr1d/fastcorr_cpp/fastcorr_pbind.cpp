@@ -18,6 +18,20 @@ PYBIND11_MODULE(fastcorr_cpp, m) {
             "Function that performs correlation"
             );
 
+    m.def(
+            "batched_filters_batched_data_channel_correlate",
+            &batched_filters_batched_data_channel_correlate<double>,
+            pybind11::return_value_policy::take_ownership,
+            "Function that performs correlation"
+    );
+
+    m.def(
+            "batched_filters_batched_data_channel_correlate",
+            &batched_filters_batched_data_channel_correlate<float>,
+            pybind11::return_value_policy::take_ownership,
+            "Function that performs correlation"
+    );
+
     m.def("batched_data_batched_filter_multichan_correlate_accum",
             &batched_data_batched_filter_multichan_correlate_accum<double>,
             pybind11::return_value_policy::take_ownership,

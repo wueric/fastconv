@@ -113,6 +113,137 @@ def multiple_filter_multiple_data_correlate1D(data_array: np.ndarray,
                                                                filter_array)
 
 
+def batch_filter_batch_data_channel_correlate1D(data_array: np.ndarray,
+                                                filter_array: np.ndarray) -> np.ndarray:
+    '''
+    Performs a multi-channel correlate, where we correlate each channel
+        of data with its own filter. Batched over a set of multichannel filters, and batched over
+        a set of multichannel data.
+
+    Conceptually similar to batch_data_batch_filter_multichan_accum_correlate1D, but does not perform
+        the accumulation sum over the channels
+
+    :param data_array: shape (batch_data, n_channels, n_samples_data); dtype either np.float32 or np.float64
+    :param filter_array: shape (batch_filter, n_channels, n_samples_filters), n_samples_filters < n_samples_data;
+        dtype either np.float32 or np.float64;
+    :return: shape (batch_data, batch_filter, n_channels, n_samples_data - n_samples_filters + 1)
+    '''
+    if data_array.ndim != 3:
+        raise ValueError("data_array must have ndim 3")
+    if filter_array.ndim != 3:
+        raise ValueError("filter_array must have ndim 3")
+
+    batch_data, ch_data, data_len = data_array.shape
+    batch_filter, ch_data_f, filter_len = filter_array.shape
+
+    if ch_data != ch_data_f:
+        raise ValueError("data_array and filter_array must have same number of channels")
+
+    if filter_len > data_len:
+        raise ValueError("filter_array must have fewer samples than data_array")
+
+    return fastcorr_cpp.batched_filters_batched_data_channel_correlate(data_array,
+                                                                       filter_array)
+
+
+def batch_filter_single_data_channel_correlate1D(data_array: np.ndarray,
+                                                 filter_array: np.ndarray) -> np.ndarray:
+    '''
+    Performs a multi-channel correlate, where we correlate each channel
+        of data with its own filter. Batched over a set of multichannel filters.
+
+    Conceptually similar to batch_filter_multichan_accum_correlate1D, but does not perform
+        the accumulation sum over the channels
+
+    :param data_array: shape (n_channels, n_samples_data); dtype either np.float32 or np.float64
+    :param filter_array: shape (batch_filter, n_channels, n_samples_filters), n_samples_filters < n_samples_data;
+        dtype either np.float32 or np.float64;
+    :return: shape (batch_filter, n_channels, n_samples_data - n_samples_filters + 1)
+    '''
+
+    if data_array.ndim != 2:
+        raise ValueError("data_array must have ndim 2")
+    if filter_array.ndim != 3:
+        raise ValueError("filter_array must have ndim 3")
+
+    ch_data, data_len = data_array.shape
+    batch_filter, ch_data_f, filter_len = filter_array.shape
+
+    if ch_data != ch_data_f:
+        raise ValueError("data_array and filter_array must have same number of channels")
+
+    if filter_len > data_len:
+        raise ValueError("filter_array must have fewer samples than data_array")
+
+    return fastcorr_cpp.batched_filters_batched_data_channel_correlate(data_array[None, :, :],
+                                                                       filter_array).squeeze(0)
+
+
+def single_filter_batch_data_channel_correlate1D(data_array: np.ndarray,
+                                                 filter_array: np.ndarray) -> np.ndarray:
+    '''
+    Performs a multi-channel correlate, where we correlate each channel
+        of data with its own filter. Batched over a set of multichannel data.
+
+    Conceptually similar to batch_data_multichan_accum_correlate1D, but does not perform
+        the accumulation sum over the channels
+
+    :param data_array: shape (batch_data, n_channels, n_samples_data); dtype either np.float32 or np.float64
+    :param filter_array: shape (n_channels, n_samples_filters), n_samples_filters < n_samples_data;
+        dtype either np.float32 or np.float64;
+    :return: shape (batch_data, n_channels, n_samples_data - n_samples_filters + 1)
+    '''
+    if data_array.ndim != 3:
+        raise ValueError("data_array must have ndim 3")
+    if filter_array.ndim != 2:
+        raise ValueError("filter_array must have ndim 2")
+
+    batch_data, ch_data, data_len = data_array.shape
+    ch_data_f, filter_len = filter_array.shape
+
+    if ch_data != ch_data_f:
+        raise ValueError("data_array and filter_array must have same number of channels")
+
+    if filter_len > data_len:
+        raise ValueError("filter_array must have fewer samples than data_array")
+
+    return fastcorr_cpp.batched_filters_batched_data_channel_correlate(data_array,
+                                                                       filter_array[None, :, :]).squeeze(1)
+
+
+def single_filter_single_data_channel_correlate1D(data_array: np.ndarray,
+                                                 filter_array: np.ndarray) -> np.ndarray:
+    '''
+    Performs a multi-channel correlate, where we correlate each channel
+        of data with its own filter.
+
+    Conceptually similar to multichan_accum_correlate1D, but does not perform
+        the accumulation sum over the channels
+
+    :param data_array: shape (n_channels, n_samples_data); dtype either np.float32 or np.float64
+    :param filter_array: shape (n_channels, n_samples_filters), n_samples_filters < n_samples_data;
+        dtype either np.float32 or np.float64;
+    :return: shape (n_channels, n_samples_data - n_samples_filters + 1)
+    '''
+
+    if data_array.ndim != 2:
+        raise ValueError("data_array must have ndim 3")
+    if filter_array.ndim != 2:
+        raise ValueError("filter_array must have ndim 2")
+
+    ch_data, data_len = data_array.shape
+    ch_data_f, filter_len = filter_array.shape
+
+    if ch_data != ch_data_f:
+        raise ValueError("data_array and filter_array must have same number of channels")
+
+    if filter_len > data_len:
+        raise ValueError("filter_array must have fewer samples than data_array")
+
+    return fastcorr_cpp.batched_filters_batched_data_channel_correlate(data_array[None, :, :],
+                                                                       filter_array[None, :, :]).squeeze(1).squeeze(0)
+
+
 def multichan_accum_correlate1D(data_array: np.ndarray,
                                 filter_array: np.ndarray) -> np.ndarray:
     '''
