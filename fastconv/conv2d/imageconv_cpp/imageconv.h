@@ -25,6 +25,61 @@ inline void omp_set_num_threads(int num_threads) { return; }
 namespace py=pybind11;
 
 template<class T>
+py::array_t<T, py::array::c_style | py::array::forcecast> batch_image_batch_filter_2d_conv_same(
+        py::array_t<T, py::array::c_style | py::array::forcecast> batched_image_matrix,
+        py::array_t<T, py::array::c_style | py::array::forcecast> batched_filter_matrix,
+        T pad_val) {
+
+    py::buffer_info batched_filter_info = batched_filter_matrix.request();
+    T *batched_filter_ptr = static_cast<T *>(batched_filter_info.ptr);
+    const int64_t filter_width = batched_filter_info.shape[1];
+    const int64_t filter_height = batched_filter_info.shape[2];
+    const int64_t offset_per_filter = filter_width * filter_height;
+
+    py::buffer_info batched_image_info = batched_image_matrix.request();
+    T *image_matrix_ptr = static_cast<T *>(batched_filter_info.ptr);
+    const int64_t n_images = batched_filter_info.shape[0];
+    const int64_t height = batched_filter_info.shape[1];
+    const int64_t width = batched_filter_info.shape[2];
+
+    const int64_t offset_per_image = height * width;
+    auto output_buffer_info = py::buffer_info(
+            nullptr,            /* Pointer to data (nullptr -> ask NumPy to allocate!) */
+            sizeof(T),     /* Size of one item */
+            py::format_descriptor<T>::value, /* Buffer format */
+            3,          /* How many dimensions? */
+            {n_images, height, width}, /* Number of elements for each dimension */
+            {sizeof(T) * height * width, sizeof(T) * width, sizeof(T)}  /* Strides for each dimension */
+    );
+
+    py::array_t<T> convolved_output = py::array_t<T>(output_buffer_info);
+    py::buffer_info output_info = convolved_output.request();
+    T *output_data_ptr = static_cast<T *> (output_info.ptr);
+
+    omp_set_num_threads(16); // Use 16 threads for all consecutive parallel regions
+    #pragma omp parallel for
+    for (int64_t i = 0; i < n_images; ++i) {
+
+        T *read_offset = i * offset_per_image + image_matrix_ptr;
+        T *write_offset = i * offset_per_image + output_data_ptr;
+        T *filter_offset = i * offset_per_filter + batched_filter_ptr;
+
+
+        TwoDContigArrayWrapper<T> input_wrapper = TwoDContigArrayWrapper<T>(
+                read_offset, height, width);
+        TwoDContigArrayWrapper<T> kernel_wrapper = TwoDContigArrayWrapper<T>(
+                filter_offset, filter_width, filter_height);
+        TwoDContigArrayWrapper<T> write_wrapper = TwoDContigArrayWrapper<T>(
+                write_offset, height, width);
+
+        conv2D_samesize(input_wrapper, kernel_wrapper, write_wrapper, pad_val);
+    }
+
+    return convolved_output;
+
+}
+
+template<class T>
 py::array_t<T, py::array::c_style | py::array::forcecast> batch_smallfilter_2dconv_same(
         py::array_t<T, py::array::c_style | py::array::forcecast> batched_image_matrix,
         py::array_t<T, py::array::c_style | py::array::forcecast> kernel_matrix,
